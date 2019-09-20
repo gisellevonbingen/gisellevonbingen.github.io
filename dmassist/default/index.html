@@ -1,0 +1,362 @@
+<html>
+
+<head>
+    <title>DMAssist</title>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="./favicon.ico">
+	
+    <script src="jquery.min.js"></script>
+    <script src="WebSocketWrapper.js"></script>
+    <script src="ChatClient.js"></script>
+	<script>
+	
+	var system = 'System';
+	var stay_hydrated_bot = 'Stay_Hydrated_Bot';
+	var bots = [stay_hydrated_bot, 'Nightbot', '싹둑', '빵_떡'];
+	
+	var lines = [];
+	var prevConnectingMessage = null;
+	
+	function onWebSocketWrapperError(obj)
+	{
+		if (prevConnectingMessage != null)
+		{
+			removeMessageNode(prevConnectingMessage);
+		}
+		
+		prevConnectingMessage = addSystemMessageNode('서버 연결중입니다. ' + obj.socket.retryCount);
+	}
+	
+	function onWebSocketWrapperOpen(obj)
+	{
+		addSystemMessageNode('연결되었습니다');
+	}
+	
+	function removeMessageNode(node)
+	{
+		document.body.removeChild(node);
+	}
+	
+	function trimOutOfBrowser()
+	{
+		while (lines.length > 0)
+		{
+			var node = lines[lines.length - 1];
+			
+			if ((node.offsetTop + node.clientHeight) > window.innerHeight * 2)
+			{
+				var removed = lines.shift();
+				removeMessageNode(removed);
+			}
+			else
+			{
+				break;
+			}
+			
+		}
+		
+	}
+	
+	function addSystemMessageNode(text)
+	{
+		var message = {};
+		message.Badges = [];
+		message.DisplayName = system;
+		message.Components = [{Text: text}];
+		message.Color = '#FFFFFF';
+		
+		return addMessageNode(message);
+	}
+	
+	function addMessageNode(message)
+	{
+		var node = createNode(message);
+		applyStyle(node);
+		
+		lines.push(node);
+		document.body.appendChild(node);
+		document.body.scrollTop = document.body.scrollHeight;
+		
+		trimOutOfBrowser();
+		
+		document.body.scrollTop = document.body.scrollHeight;
+		
+		return node;
+	}
+	
+	function onClientMessage(obj, message)
+	{
+		addMessageNode(message);
+	}
+	
+	function onClientConfigNotify(obj)
+	{
+		for (var i = 0; i < lines.length; i++)
+		{
+			applyStyle(lines[i]);
+		}
+		
+		document.body.scrollTop = document.body.scrollHeight;
+	}
+	
+	function applyStyle(node)
+	{
+		var config = client.config;
+		var message = node.message;
+		var badges = message.Badges;
+		var displayName = message.DisplayName;
+		var components = message.Components;
+		var color = message.Color;
+		
+		if (config == null)
+		{
+			return;
+		}
+		
+		var colorOverride = '';
+		var badgeColorBarStyleName = getBadgeColorBarStyleName(displayName, badges);
+		
+		var style = config.Style;
+	
+		if (displayName == stay_hydrated_bot)
+		{
+			colorOverride = ';color: ' + color;
+		}
+		
+		document.body.style = style.Body;
+		
+		node.querySelector('.Background').style = style.Background;
+		node.querySelector('.BadgeColorBar').style = style.BadgeColorBar + ('' + style['BadgeColorBar.' + badgeColorBarStyleName]).replace('{=chatColor}', color);
+		node.querySelector('.ChatColorBar').style = style.ChatColorBar + ';background-color: ' + color;
+		node.querySelector('.Content').style = style.Content;
+		
+		node.querySelector('.User').style = style.User;
+		node.querySelector('.DisplayName').style = style.DisplayName + colorOverride;
+		node.querySelector('.BadgeContainer').style = style.BadgeContainer;
+		
+		var badgeNodes = node.querySelectorAll('.Badge');
+		var badgeSize = config.BadgeSize;
+		applyStyleNodes(badgeNodes, style.Badge, function(i, n)
+		{
+			n.src = badges[i].Path + badgeSize;
+		});
+		
+		node.querySelector('.ComponentContainer').style = style.ComponentContainer;
+		
+		var componentChatNodes = node.querySelectorAll('.ComponentChat');
+		applyStyleNodes(componentChatNodes, style.ComponentChat, function(i, n)
+		{
+			if (message.ColorChat == true)
+			{
+				n.style = style.ComponentChat + colorOverride;
+			}
+				
+		});
+		
+		var componentTwitchEmoteNodes = node.querySelectorAll('.ComponentTwitchEmote');
+		var twitchEmoteSize = config.EmoteSize;
+		applyStyleNodes(componentTwitchEmoteNodes, style.ComponentTwitchEmote, function(i, n)
+		{
+			n.src = n.component.URL + twitchEmoteSize;
+		});
+		
+		var componentDCConNodes = node.querySelectorAll('.ComponentDCCon');
+		applyStyleNodes(componentDCConNodes, style.ComponentDCCon, function(i, n)
+		{
+			n.src = n.component.URL;
+		});
+	}
+	
+	function applyStyleNodes(nodes, style, func)
+	{
+		for (var i = 0; i < nodes.length; i++)
+		{
+			var node = nodes[i];
+			node.style = style;
+			
+			if (func != null)
+			{
+				func(i, node);
+			}
+				
+		}
+		
+	}
+	
+	function createNode(message)
+	{
+		var config = client.config;
+		var badges = message.Badges;
+		var displayName = message.DisplayName;
+		var components = message.Components;
+		
+		var mainDiv = document.createElement('div');
+		mainDiv.message = message;
+		
+		var tableDiv = document.createElement('table');
+		tableDiv.className = 'Background';
+		mainDiv.appendChild(tableDiv);
+		
+		var lineDiv = document.createElement('tr');
+		tableDiv.appendChild(lineDiv);
+		
+		var badgeColorBar = document.createElement('td');
+		badgeColorBar.className = 'BadgeColorBar';
+		lineDiv.appendChild(badgeColorBar);
+		
+		var chatColorBar = document.createElement('td');
+		chatColorBar.className = 'ChatColorBar';
+		lineDiv.appendChild(chatColorBar);
+		
+		var contentWrapper = document.createElement('td');
+		lineDiv.appendChild(contentWrapper);
+		
+		var contentDiv = document.createElement('div');
+		contentDiv.className = 'Content';
+		contentWrapper.appendChild(contentDiv);
+		
+		var userDiv = document.createElement('div');
+		userDiv.className = 'User';
+		contentDiv.appendChild(userDiv);
+		
+		{
+			var displayNameNode = document.createElement('label');
+			displayNameNode.className = 'DisplayName';
+			displayNameNode.innerText = displayName;
+			userDiv.appendChild(displayNameNode);
+		}
+		
+		var badgeContainerDiv = document.createElement('span');
+		badgeContainerDiv.className = 'BadgeContainer';
+		userDiv.appendChild(badgeContainerDiv);
+		
+		for (var i = 0; i < badges.length; i++)
+		{
+			var badgeNode = document.createElement('img');
+			badgeNode.className = 'Badge';
+			badgeContainerDiv.appendChild(badgeNode);
+		}
+		
+		var componentsDiv = document.createElement('div');
+		componentsDiv.className = 'ComponentContainer';
+		contentDiv.appendChild(componentsDiv);
+		
+		for (var i = 0; i < components.length; i++)
+		{
+			var component = components[i];
+			var componentNode = null;
+			var text = component.Text;
+			var url = component.URL;
+			
+			if (text != null)
+			{
+				componentNode = document.createElement('label');
+				componentNode.className = 'ComponentChat';
+				componentNode.innerText = text;
+			}
+			else if (url != null)
+			{
+				var type = component.Type;
+				componentNode = document.createElement('img');
+				
+				if (type == 'TwitchEmote')
+				{
+					componentNode.className = 'ComponentTwitchEmote';
+				}
+				else if (type == 'DCCon')
+				{
+					componentNode.className = 'ComponentDCCon';
+				}
+				
+			}
+			
+			if (componentNode != null)
+			{
+				componentNode.component = component;
+				componentsDiv.appendChild(componentNode);
+			}
+				
+		}
+		
+		return mainDiv;
+	}
+	
+	function getBadgeColorBarStyleName(displayName, badges)
+	{
+		var botIndex = bots.indexOf(displayName);
+		
+		if (botIndex != -1)
+		{
+			if (displayName == stay_hydrated_bot)
+			{
+				return 'stay_hydrated_bot';
+			}
+			else
+			{
+				return 'bots';
+			}
+			
+		}
+		
+		for (var i = 0; i < badges.length; i++)
+		{
+			var badge = badges[i];
+			var name = badge.Name;
+			
+			if (name == 'broadcaster')
+			{
+				return 'broadcaster';
+			}
+			else if (name == 'moderator') 
+			{
+				return 'moderator';
+			}
+			else if (name == 'vip') 
+			{
+				return 'vip';
+			}
+			
+		}
+		
+		return 'default';
+	}
+	
+	function setTimeoutScrollToBottom()
+	{
+		setTimeout(setTimeoutScrollToBottom, 100);
+		
+		var body = document.body;
+		
+		if (body != null)
+		{
+			body.scrollTop = body.scrollHeight;
+		}
+			
+	}
+	
+	var client = new ChatClient();
+	client.themeName = "기본";
+	client.socket.url = "ws://127.0.0.1:6974/TwitchChat";
+	client.socket.timeout = 1000;
+	client.onError = onWebSocketWrapperError;
+	client.onOpen = onWebSocketWrapperOpen;
+	client.onMessage = onClientMessage;
+	client.onConfigNotify = onClientConfigNotify;
+	client.socket.start();
+	
+	
+	setTimeoutScrollToBottom();
+	
+	
+	</script>
+</head>
+<body>
+
+</body>
+
+<script>
+
+	addSystemMessageNode('버전 : 01.00.01, 날짜 : 2019-06-13 10:30');
+</script>
+
+</html>

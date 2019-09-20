@@ -1,0 +1,43 @@
+html {
+}
+body {
+	font-size: 11pt;
+	box-sizing: inherit;
+	background-color: #E5E5E5;
+	font-family: "맑은 고딕";
+	text-rendering: optimizeLegibility;
+}
+
+body {
+	
+}
+
+td {
+	padding: 0px;
+	margin: 0px;
+}
+
+tr {
+	padding: 0px;
+	margin: 0px;
+}
+
+div {
+}
+
+div.volumecontainer {
+	display: flex;
+	flex-direction: row;
+	flex-wrap : wrap;
+}
+
+div.volume {
+	display:block;
+	margin-left: 10px;
+	margin-top: 10px;
+	font-size: 11pt;
+	padding: 5px;
+	border-color: #000000;
+	border: 2px solid;
+	width: fit-content;
+}
