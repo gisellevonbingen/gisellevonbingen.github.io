@@ -48,7 +48,7 @@ body {
 .chat_upper_box {
   position: relative;
   padding: 0.125rem 0.5rem 0 0.5rem;
-  font-size: 0.875rem;
+  font-size: 1.000rem;
   display: flex;
   z-index: 10;
 }
@@ -130,7 +130,7 @@ body {
 .chat_msg_box, .chat_subscribe_box, .chat_clip_box {
   padding: 0 0.5rem 0.25rem 0.5rem;
   max-height: 14rem; /* 텍스트 영역 최대 높이 */
-  font-size: 0.875rem;
+  font-size: 1.000rem;
 }
 .chat_msg_box.image_only:empty {
   display: none;
