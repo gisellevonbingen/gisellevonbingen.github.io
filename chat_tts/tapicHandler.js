@@ -58,7 +58,6 @@ TapicHandler.prototype.onIRCMessage = function(e)
 			
 			if (line)
 			{
-				console.log(line);
 				this.processLine(line);
 			}
 			
