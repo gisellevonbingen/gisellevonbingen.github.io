@@ -2,7 +2,7 @@ function ChatClient()
 {
 	this.onOpen = function(obj) { };
 	this.onError = function(obj) { };
-	this.onCommand = function(obj, json) { };
+	this.onMessage = function(obj, json) { };
 	this.onConfigNotify = function(obj) { };
 	
 	this.themeName = null;
@@ -36,9 +36,14 @@ function ChatClient()
 			cc.config = json.Config;
 			cc.onConfigNotify(cc);
 		}
-		else if (type == "command")
+		else if (type == "chat")
 		{
-			cc.onCommand(obj.Tag, json);
+			var badges = json.Badges;
+			var displayName = json.DisplayName;
+			var color = json.Color;
+			var components = json.components;
+			
+			cc.onMessage(obj.Tag, json.Message);
 		}
 		
 	};
