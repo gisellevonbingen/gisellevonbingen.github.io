@@ -1,0 +1,98 @@
+html {
+	box-sizing: border-box;
+}
+body {
+	font-size: 11pt;
+	box-sizing: inherit;
+	background-color: #E5E5E5;
+	width: 620px;
+	min-height: 600px;
+	font-family: "맑은 고딕";
+	text-rendering: optimizeLegibility;
+}
+div {
+	display: block;
+	font-size: 14pt;
+}
+div.cons {
+	color: #232323;
+	margin-bottom: 50px;
+}
+div.headerDescription {
+	font-size: 18pt;
+}
+div.headerTagsDiv {
+	font-size: 11pt;
+}
+div.selected {
+	background: white;
+	height: 50px;
+	position: fixed;
+	width: 100%;
+	bottom: 0px;
+    display: table;
+    table-layout: fixed;
+}
+div.selectedInner {
+    display: table-cell;
+    vertical-align: middle;
+	padding-left:10px;
+	padding-right:10px;
+}
+img.lazy {
+ width: 75px;
+ height: 75px;
+ padding: 1px;
+ margin: 0px;
+}
+img.hidden {
+ width: 0;
+ height: 0;
+ padding: 0px;
+ margin: 0px;
+}
+textarea.editTextBox {
+ padding: 1px;
+ margin: 0px;
+}
+label.button {
+	border-radius: 10px;
+	align-items: center;
+	cursor: pointer;
+	background: #FFFFFF;
+	color:#232323;
+	margin-right: 8px;
+	padding: 5px 10px 5px 10px;
+	text-decoration: none;
+	vertical-align: middle;
+	display: inline-flex;
+}
+label.tag_button{
+	margin-bottom: 8px;
+	margin-right: 8px;
+}
+label.tag_selected {
+	background: #232323;
+	color:#E5E5E5;
+}
+label.cut_button {
+	background: #232323;
+	color:#E5E5E5;
+}
+
+label.copy {
+	border-radius: 10px;
+	align-items: center;
+	cursor: pointer;
+	background: #FFFFFF;
+	color:#232323;
+	margin-left: 8px;
+	margin-bottom: 8px;
+	padding: 5px 10px 5px 10px;
+	text-decoration: none;
+	vertical-align: middle;
+	display: inline-flex;
+}
+input {
+	margin-left: 5px;
+}
